@@ -1,0 +1,22 @@
+Storage management library
+
+To install:
+
+cd builddir
+
+tar xf dist.tar
+
+The Makefile has changed from earlier versions of the library; it no
+longer requires GNU make, but it does use an include file feature.  If
+your version of make can't handle include files, you need to insert
+the file "dependencies" at the end of the Makefile (and nuke the
+include line).
+
+Edit the DEST* variables at the top of the file to say where things
+should be installed.
+
+There is a man page mem.3 describing the library interface.
+
+Send bug reports, questions and comments to:
+
+long@research.att.com

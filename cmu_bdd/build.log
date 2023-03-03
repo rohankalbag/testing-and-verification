@@ -1,0 +1,59 @@
+for archive in libbdd.a; do \
+	  mv $archive /home/madhav/MpdCourses/Git/ee709/cmu_bdd/lib/; \
+	done
+for include in bdduser.h bddint.h; do \
+	  cp -f $include /home/madhav/MpdCourses/Git/ee709/cmu_bdd/include; \
+	done
+for manpage in bdd.3; do \
+	  case $manpage in \
+	    *.1 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man1;; \
+	    *.3 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man3;; \
+	  esac; \
+	done
+cc -g -I. -I/home/madhav/MpdCourses/Git/ee709/cmu_bdd/include   -c -o testbdd.o testbdd.c
+testbdd.c: In function 'test_dump':
+testbdd.c:1169: warning: incompatible implicit declaration of built-in function 'exit'
+cc -o testbdd testbdd.o -L. -L/home/madhav/MpdCourses/Git/ee709/cmu_bdd/lib/ -lbdd -lmem
+/usr/bin/ld: cannot find -lmem
+collect2: ld returned 1 exit status
+make: *** [testbdd] Error 1
+for archive in libmem.a; do \
+	  mv $archive /home/madhav/MpdCourses/Git/ee709/cmu_bdd/lib/; \
+	done
+for include in memuser.h; do \
+	  cp -f $include /home/madhav/MpdCourses/Git/ee709/cmu_bdd/include; \
+	done
+for manpage in mem.3; do \
+	  case $manpage in \
+	    *.0 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man0;; \
+	    *.1 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man1;; \
+	    *.2 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man2;; \
+	    *.3 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man3;; \
+	    *.4 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man4;; \
+	    *.5 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man5;; \
+	    *.6 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man6;; \
+	    *.7 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man7;; \
+	    *.8 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man8;; \
+	  esac; \
+	done
+cc -o boole grammar.o hash.o input.o main.o vec.o -L/home/madhav/MpdCourses/Git/ee709/cmu_bdd/lib/ -lbdd -lmem
+cp -f boole /home/madhav/MpdCourses/Git/ee709/cmu_bdd/bin
+for archive in libtr.a; do \
+	  mv $archive /home/madhav/MpdCourses/Git/ee709/cmu_bdd/lib/; \
+	done
+for include in truser.h; do \
+	  cp -f $include /home/madhav/MpdCourses/Git/ee709/cmu_bdd/include; \
+	done
+for manpage in tr.3; do \
+	  case $manpage in \
+	    *.0 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man0;; \
+	    *.1 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man1;; \
+	    *.2 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man2;; \
+	    *.3 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man3;; \
+	    *.4 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man4;; \
+	    *.5 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man5;; \
+	    *.6 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man6;; \
+	    *.7 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man7;; \
+	    *.8 ) cp -f $manpage /home/madhav/MpdCourses/Git/ee709/cmu_bdd/man/man8;; \
+	  esac; \
+	done

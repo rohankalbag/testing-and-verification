@@ -1,0 +1,47 @@
+BDD manipulation library
+
+To install:
+
+Install the storage management library first.
+
+cd builddir
+
+tar xf dist.tar
+
+The Makefile has changed from earlier versions of the library; it no
+longer requires GNU make, but it does use an include file feature.  If
+your version of make can't handle include files, you need to insert
+the file "dependencies" at the end of the Makefile (and nuke the
+include line).
+
+Edit the DEST* variables at the top of the file to say where things
+should be installed.
+
+make
+
+There is a man page bdd.3 describing the library interface.
+
+There is also a test program (testbdd) that you might want to run.  If
+everything works right, it will print out dots as it chugs along, then
+dump out some statistics.  It takes a while to run all of the tests,
+but it's just doing the same types of operations repeatedly on
+randomly generated arguments, so you can bag it whenever you get
+tired, or you can change the ITERATIONS definition at the top of the
+program.  The program writes some temporary files to /tmp/.
+
+You might also want to look at testbdd.c as an example of a program
+that uses the library.  It exercises most of the routines to some
+degree.
+
+The dynamic reordering support is fairly new, and as such hasn't been
+tested as much as some of the other stuff.  The number of available
+reordering methods is still small, but will probably increase in the
+future.  My experience so far has been that the sifting approach
+(bdd_reorder_sift) is fairly effective, but slow.  On the other hand,
+the window-based methods tend to get stuck in local minima.  If you
+already have a pretty good ordering, the window methods may be the
+right choice though.
+
+Send bug reports, questions and comments to:
+
+long@research.att.com

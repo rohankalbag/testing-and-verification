@@ -1,0 +1,33 @@
+
+1.  Source the export.sh file
+
+	source export.sh
+
+    This sets up the paths etc needed to 
+    use the BDD package.
+
+2.  Run the install script.
+
+	source install.sh
+
+
+3.  Run the ./build.sh script.
+
+	./build.sh
+
+    There is some problem?  Run it 
+    again
+
+	./build.sh
+
+4.  The package is ready to use.  Go to
+    the tests/ directory and look at
+    hello_world.c
+
+
+
+4.  At any point, for more information, type
+	(assuming you are in this directory)
+
+	man -M ./man bdd
+

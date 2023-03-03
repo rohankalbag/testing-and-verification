@@ -1,0 +1,26 @@
+Transition relation library
+
+To install:
+
+Install the storage management and BDD libraries first.
+
+cd builddir
+
+tar xf dist.tar
+
+The Makefile uses an include file feature.  If your version of make
+can't handle include files, you need to insert the file "dependencies"
+at the end of the Makefile (and nuke the include line).
+
+Edit the DEST* variables at the top of the file to say where things
+should be installed.
+
+make
+
+There is a man page tr.3 describing the library interface.
+
+This code is fairly new, and hasn't been really beat on extensively.
+
+Send bug reports, questions and comments to:
+
+long@research.att.com

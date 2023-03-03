@@ -1,0 +1,163 @@
+This is a simple boolean calculator demonstrating some of the
+facilities in the BDD library.
+
+To install:
+
+Install the storage management and BDD libraries first.
+
+cd builddir
+
+tar xf dist.tar
+
+Edit the DESTBIN variable to say where to install the binary.
+
+make
+
+If you don't want to install the binary, just
+
+make boole
+
+The program reads commands from standard input and writes to standard
+output.  The only command line option to the program is -i, which
+means "interactive mode".  This just causes a prompt to be printed
+before each command.  The available commands are:
+
+Creating variables:
+	vars <id> <id> ... ;
+	Create some new boolean variables and assign them to the
+	identifiers given by <id>s.
+
+Variable assignment:
+	<id> := <expr> ;
+	Evaluates an expression and assigns the result to <id>.
+	Any previous definition of <id> is lost.  The syntax of
+	expressions is defined below.
+
+Association assignment:
+	<id> [= <assoc> ;
+	Evaluates a variable association and assigns the result to
+	<id>.  Any previous definition of <id> is lost.  The syntax of
+	variable associations is defined below.
+
+Clear:
+	clear all ;
+	clear <id> <id> ... ;
+	Deletes all definitions or the definitions of the specified
+	identifiers.  The first form also restarts the BDD package.
+
+Printing:
+	print <expr> ;
+	sop <expr> ;
+	Print an expression, either as a BDD (if-then-else form), or
+	as a sum-of-products expression.
+
+Profiles:
+	profile <expr> <expr> ... ;
+	funcprof <expr> <expr> ... ;
+	Print a profile or function profile of the expressions.  The
+	profile shows the number of BDD nodes at each level.  The
+	function profile shows the number of subfunctions obtainable
+	by restricting the variables above each level.
+
+Sizes:
+	size <expr> <expr> ... ;
+	Print the number of BDD nodes used in representing the given
+	expressions.
+
+Getting satisfying assignments:
+	satisfy <expr> ;
+	satsupport <assoc> <expr> ;
+	Find and print a satisfying assignment for the expression.
+	For satsupport, all variables involved in <assoc> will be
+	assigned values.
+
+Getting valuation counts:
+	satfrac <expr> ;
+	Prints the fraction of valuations that make the expression
+	TRUE.
+
+Printing meaningless statistics:
+	stats ;
+	Print some BDD library statistics.
+
+Setting the node limit:
+	limit <number> ;
+	limit none ;
+	Set the BDD node limit to the indicated number of nodes, or
+	get rid of the node limit.  If the number of nodes gets bigger
+	than <number> during an operation, the operation will be
+	aborted.
+
+Dynamic reordering:
+	reorder sift ;
+	reorder window ;
+	reorder hybrid ;
+	reorder none ;
+	reorder ;
+	The first four commands set the dynamic reordering method used
+	to the one specified (Rudell's sifting approach, a 3 variable
+	wide window-based method, a modified sifting algorithm, or
+	none).  The last command invokes the current reordering
+	method.
+
+Garbage collecting:
+	gc ;
+	Invoke the garbage collector to sweep up unused BDD nodes.
+
+Timing things:
+	timer ;
+	timer off ;
+	The first form either starts the timer, or prints the elapsed
+	CPU time since the timer was started and since the last timer
+	command.  The second form prints the elapsed times and also
+	stops the timer.
+
+Quitting:
+	Send an EOF indication to quit.
+
+Expression syntax:
+	<id>
+		a boolean variable
+	0
+		FALSE
+	1
+		TRUE
+	( <expr> )
+	<expr1> [ <id> := <expr2> ]
+		expression <expr1> with the variable <id> replaced by
+		<expr2>
+	<expr1> ? <expr2> : <expr3>
+		if-then-else of <expr1>, ..., <expr3>
+	<expr1> & <expr2>
+	<expr1> * <expr2>
+		conjunction
+	<expr1> | <expr2>
+	<expr1> + <expr2>
+		disjunction
+	<expr1> = <expr2>
+		equivalence
+	<expr1> ^ <expr2>
+		exclusive or
+	! <expr>
+	~ <expr>
+		negation
+	exists <assoc> ( <expr> )
+		existential quantification over the variables involved
+		in <assoc>
+	forall <assoc> ( <expr> )
+		universal quantification over the variables involved
+		in <assoc>
+	subst <assoc> ( <expr> )
+		<expr> with the variables in <assoc> replaced by their
+		associated expressions
+
+Variable association syntax:
+	[ <id> <id> ... ]
+		an association with each of the specified variables
+		associated to TRUE.  This form is typically used for
+		specifying sets of variables for things like
+		existential quantification.
+	[ <id> := <expr> <id> := <expr> ... ]
+		an association with the specified variables
+		associatied with the indicated expressions.  Typically
+		for simultaneous substitution.

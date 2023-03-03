@@ -1,0 +1,549 @@
+.\" Transition relation library man page
+.TH MEM 3 "16 November 1993"
+.SH NAME
+tr \- a transition relation manipulation package
+.SH SYNOPSIS
+.B #include <truser.h>
+.SH DESCRIPTION
+The
+.B libtr
+library provides a set of routines for manipulating transition
+relations and doing state space searches in a BDD-based setting.
+Programs designed to be used with the library should use the
+.B -ltr -lbdd -lmem
+options to
+.B cc
+when linking.
+.SH "LIST OF FUNCTIONS"
+.nf
+.ta 3in
+\fIName\fP	\fIFunction\fP
+tr_version	Get library version string
+tr_basic	Create a transition relation (TR)
+tr_conjunctive	Create a conjunctively partitioned TR
+tr_conjunctive_multiple	Create a conjunctively partitioned TR
+tr_disjunctive	Create a disjunctively partitioned TR
+tr_disjunctive_multiple	Create a disjunctively partitioned TR
+tr_condition	Add pre and post conditions to a TR
+tr_reduce	Simplify a TR using pre and post conditions
+tr_copy		Make a copy of a TR
+tr_free		Deallocate a TR
+tr_step		Compute the image of a state set under a TR
+tr_reduce_step	Compute an image while simplifying
+tr_reduce_step_multiple	Compute an image while simplifying
+tr_search_init	State space search
+tr_search_next	State space search
+tr_search_step	State space search
+tr_search_quit	State space search
+tr_converse	Compute the converse relation of a TR
+tr_crunch	Flatten the partition structure of a TR
+tr_crunch_limit	Flatten the partition structure of a TR
+tr_conj_part_reorder	Optimize(?) conjunctive partitioning order
+.fi
+.SH "OVERVIEW"
+The library is designed for manipulating partitioned transition
+relations and for doing state space searches in a BDD-based setting.
+For details on BDD-based verification of finite-state systems, see [1]
+or [2].
+For detailed explanations of partitioned transitions relations, see
+references [3] and [4].
+Basically, partitioned transition relations are a way of representing
+the transitions of a finite-state system using multiple BDDs.
+In practice, this is often much more efficient than using a single
+monolithic BDD.
+Each element of a partitioned transition relation represents the
+behavior of one component of the system.
+There are two types of partitioning, depending on how these components
+are composed.
+In conjunctive partitioning, each step of the composition represents a
+step of all of the components.
+A collection of finite-state machines all running on the same clock
+could be represented with conjunctive partitioning.
+In disjunctive partitioning, each step of the composition corresponds
+to a step of exactly one of the components.
+It is often appropriate for asynchronous systems.
+.SH "DETAILED DESCRIPTION"
+.B char *
+.br
+.B tr_version()
+.in +4
+Returns a string identifying the library version number.
+.LP
+.B tr
+.br
+.B tr_basic(bddm, t, changes, vt_fn, vt_env)
+.br
+.B bdd_manager bddm;
+.br
+.B bdd t;
+.br
+.B bdd *changes;
+.br
+.B bdd (*vt_fn)();
+.br
+.B pointer vt_env;
+.in +4
+Creates a transition relation representing a basic component whose
+transitions are defined by the BDD \fBt\fR.
+.B changes
+is a null-terminated array of BDD variables that represent the state
+components that change when the component transitions.
+For example, if this transition relation represents a single latch in
+a synchronous circuit,
+.B changes
+should hold just the state variable for the latch.
+The function
+.B vt_fn
+is a variable translation function.
+Each state variable should have (at least) two forms: a current-state
+form and a next-state form, and this function is used to translate
+between them.
+The function receives as arguments: the BDD manager \fBbddm\fR, a BDD
+representing the variable to translate, an integer giving the form to
+translate the variable to, and the pointer given by \fBvt_env\fR.
+The BDD representing the variable may be either the current-state or
+next-state form of the variable.
+The integer will be one of
+.B VT_NORMAL
+or \fBVT_PRIME\fR.
+The former indicates that the current-state form should be returned,
+and the latter indicates the next-state form.
+If the BDD
+.B t
+depends on some variables which are not state variables,
+.B vt_fn
+may also be called on these variables.
+In this case, it should return the variable unchanged regardless of
+the form indicated by the integer.
+.LP
+.B tr
+.br
+.B tr_conjunctive(bddm, t1, t2)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t1;
+.br
+.B tr t2;
+.in +4
+Forms a relation representing the conjunctive partitioning of
+.B t1
+and \fBt2\fR.
+.LP
+.B tr
+.br
+.B tr_conjunctive_multiple(bddm, ts)
+.br
+.B bdd_manager bddm;
+.br
+.B tr *ts;
+.in +4
+Forms a relation representing the conjunctive partitioning of the
+transition relations in \fBts\fR, which should be a null-terminated
+array.
+.LP
+.B tr
+.br
+.B tr_disjunctive(bddm, t1, t2)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t1;
+.br
+.B tr t2;
+.in +4
+Forms a relation representing the disjunctive partitioning of
+.B t1
+and \fBt2\fR.
+.LP
+.B tr
+.br
+.B tr_disjunctive_multiple(bddm, ts)
+.br
+.B bdd_manager bddm;
+.br
+.B tr *ts;
+.in +4
+Forms a relation representing the disjunctive partitioning of the
+transition relations in \fBts\fR, which should be a null-terminated
+array.
+.LP
+.B tr
+.br
+.B tr_condition(bddm, t, pre, post, vt_fn, vt_env)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t;
+.br
+.B bdd pre;
+.br
+.B bdd post;
+.br
+.B bdd (*vt_fn)();
+.br
+.B pointer vt_env;
+.in +4
+Returns a transition relation representing
+.B t
+with the indicated pre and post conditions applied.
+The effect of stepping a state set using this transition relation is
+to:
+intersect with the set represented by \fBpre\fR, step by \fBt\fR, and
+intersect with the set represented by \fBpost\fR.
+Both
+.B pre
+and
+.B post
+should be specified in terms of current-state versions of the
+variables.
+.B vt_fn
+and
+.B vt_env
+are as described in the notes for \fBtr_basic\fR.
+.LP
+.B tr
+.br
+.B tr_reduce(bddm, t, pre, post)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t;
+.br
+.B bdd pre;
+.br
+.B bdd post;
+.in +4
+Simplifies the transition relation
+.B t
+using the indicated pre and post conditions as ``care'' sets.
+If, for example, you have computed the reachable states of a system,
+you can use
+.B tr_reduce
+with the reachable state set as a pre and post condition.
+By doing this, you essentially promise not to step the simplified
+relation from any non-reachable states, and not to look at the result
+for any non-reachable states.
+Also see
+.B tr_reduce_step
+below.
+.LP
+.B tr
+.br
+.B tr_copy(bddm, t)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t;
+.in +4
+Make a copy of the transition relation \fBt\fR.
+Currently, transition relations have reference counts, so this
+actually just increments the reference count of \fBt\fR.
+.LP
+.B tr
+.br
+.B tr_free(bddm, t)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t;
+.in +4
+Decrements the reference count of \fBt\fR, and, if the reference count
+drops to zero, frees the storage associated with \fBt\fR.
+If you are building up the transition relation of a system, you should
+call
+.B tr_free
+on the intermediate results after they have been used.
+.LP
+.B bdd
+.br
+.B tr_step(bddm, t, f, vt_fn, vt_env)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t;
+.br
+.B bdd f;
+.br
+.B bdd (*vt_fn)();
+.br
+.B pointer vt_env;
+.in +4
+Computes the image of the state set represented by
+.B f
+under the transition relation \fBt\fR.
+.B vt_fn
+and
+.B vt_env
+are as in \fBtr_basic\fR.
+.LP
+.B bdd
+.br
+.B tr_reduce_step(bddm, t, f, pre, post, vt_fn, vt_env)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t;
+.br
+.B bdd f;
+.br
+.B bdd pre;
+.br
+.B bdd post;
+.br
+.B bdd (*vt_fn)();
+.br
+.B pointer vt_env;
+.in +4
+Computes the image of the state set represented by
+.B f
+under the transition relation \fBt\fR.
+Initially,
+.B f
+is simplified using the state set given by
+.B pre
+as the ``care'' set.
+The result is simplified using the state set given by
+.B post
+as the ``care'' set.
+This routine is typically used when doing a state space search.
+When computing the image of a set of states, we generally don't care
+about whether or not already-reached states appear in the result.
+In this case, we would use the complement of the set of
+already-reached states as the post condition.
+.B vt_fn
+and
+.B vt_env
+are as in \fBtr_basic\fR.
+.LP
+.B bdd
+.br
+.B tr_reduce_step_multiple(bddm, t, f, pre, post, vt_fn, vt_env)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t;
+.br
+.B bdd f;
+.br
+.B bdd *pre;
+.br
+.B bdd *post;
+.br
+.B bdd (*vt_fn)();
+.br
+.B pointer vt_env;
+.in +4
+Similar to \fBtr_reduce_step\fR, except that the pre and post
+conditions are given by null-terminated arrays of BDDs.
+Simplification is with respect to each element of the arrays.
+.LP
+.B search_state
+.br
+.B tr_search_init(bddm, t, initial, vt_fn, vt_env)
+.br
+.B int
+.br
+.B tr_search_next(bddm, ss, tptr, reachedptr, frontierptr)
+.br
+.B void
+.br
+.B tr_search_step(bddm, ss, next)
+.br
+.B void
+.br
+.B tr_search_quit(bddm, ss)
+.LP
+.B bdd_manager bddm;
+.br
+.B bdd initial;
+.br
+.B bdd (*vt_fn)();
+.br
+.B pointer vt_env;
+.br
+.B search_state ss;
+.br
+.B tr *tptr;
+.br
+.B bdd *reachedptr;
+.br
+.B bdd *frontierptr;
+.br
+.B bdd next;
+.in +4
+These four routines are used to do state space searches.
+For maximum flexibility, the search is done using a reverse-call
+paradigm.
+The library routines will be responsible for organizing the search and
+user-level code will be responsible for doing the actual image
+computation steps.
+The search is initiated by calling
+.B tr_search_init
+with the desired transition relation and initial state set.
+The returned result is an object of type \fBsearch_state\fR, which
+should be passed to the other three routines.
+The actual search is done through a series of calls to the routines
+.B tr_search_next
+and \fBtr_search_step\fR.
+.B tr_search_next
+returns an integer.
+If this integer is non-zero, it means that the search has completed.
+In this case, a BDD representing the reached state set is stored in
+\fBreachedptr\fR.
+If the integer is zero, then the search is not yet done.
+In this case,
+.B reachedptr
+is set to the current set of reached states,
+.B frontierptr
+is set to the states on the ``search frontier'', and
+.B tptr
+is set to a transition relation that should be used for the next image
+computation.
+The user-level code should compute the image of the returned frontier
+under the returned transition relation.
+It may use the current reached states for simplification (via
+\fBtr_reduce_step\fR).
+The user-level code is responsible for freeing the returned BDDs.
+The returned transition relation is suitable only for calls to
+.B tr_step
+or \fBtr_reduce_step\fR, and should not be passed to other library
+routines.
+The user-level code may print statistics about the current set of
+reached states, save the successive approximations, etc., as it
+desires.
+Once the successors of the frontier have been computed, the user-level
+code should call
+.B tr_search_step
+with the results of the image computation.
+Once
+.B tr_search_next
+indicates that all of the reachable states have been found, the
+.B tr_search_quit
+routine should be called.
+.B tr_search_quit
+may also be called to terminate the search at any other point.
+
+When the transition relation used for the search is a disjunctively
+partitioned transition relation, then these routines use a modified
+breadth-first search (MBFS).
+For details on MBFS, see [4].
+Basically, in a MBFS, an individual component of the (disjunctive)
+transition relation is allowed to execute until no more reachable
+states are found.
+Then a different component is chosen and the process is repeated.
+We keep picking components until no component uncovers any new
+reachable states when it executes.
+This process gives the same results as a standard breadth-first
+search, but often is more efficient.
+Because of the way the search works however, there may be points
+during the search where
+.B tr_search_next
+returns the same set of current reached states several times in a row,
+even though the complete set of reached states has not yet been
+computed.
+Thus, it is important to detect termination using the return value of
+\fBtr_search_next\fR, rather than a comparison between successive sets
+of reached states.
+.LP
+.B tr
+.br
+.B tr_converse(bddm, t, vt_fn, vt_env)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t;
+.br
+.B bdd (*vt_fn)();
+.br
+.B pointer vt_env;
+.in +4
+Returns a transition relation representing the converse of \fBt\fR.
+This is used for doing reverse searches.
+.LP
+.B tr
+.br
+.B tr_crunch(bddm, t, vt_fn, vt_env)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t;
+.br
+.B bdd (*vt_fn)();
+.br
+.B pointer vt_env;
+.in +4
+Smashes the given transition relation down into essentially a single
+monolithic BDD, and returns a transition relation representing the
+result.
+.LP
+.B tr
+.br
+.B tr_crunch_limit(bddm, t, limit, keep_disj, vt_fn, vt_env)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t;
+.br
+.B long limit;
+.br
+.B int keep_disj;
+.br
+.B bdd (*vt_fn)();
+.br
+.B pointer vt_env;
+.in +4
+This is a generalized form of \fBtr_crunch\fR.  The transition
+relation is flattened in a bottom-up fashion, and flattening stops if
+the BDD size of a piece would exceed
+.B limit
+nodes.  In addition, if
+.B keep_disj
+is non-zero, then any top-level disjunctive partitioning is preserved.
+This is intended for cases when the result will be used with the
+library's search routines.
+.LP
+.B tr
+.br
+.B tr_conj_part_reorder(bddm, t)
+.br
+.B bdd_manager bddm;
+.br
+.B tr t;
+.in +4
+Reorders the elements in the conjunctively partitioned transition
+relations within
+.B t
+in an attempt to improve efficiency.
+The routine uses a crude measure of efficiency based on the number of
+BDD variables in the supports of intermediate results.
+A hill-climbing approach is used to try to reduce this measure.
+My experience has been that this helps a bit in many cases, helps
+enormously every now and then when you don't have a good order, and
+when you do have a good order, it generally won't screw things up.
+.SH "SEE ALSO"
+bdd(3), mem(3)
+.SH BUGS
+Currently, nothing is done when a BDD library node overflow occurs.
+.SH REFERENCES
+[1] J. R. Burch, E. M. Clarke, K. L. McMillan, and D. L. Dill.
+Sequential Circuit Verification Using Symbolic Model Checking.  In
+\fIProceedings of the 27th ACM/IEEE Design Automation Conference\fR,
+June, 1990.
+.LP
+[2] J. R. Burch, E. M. Clarke, K. L. McMillan, D. L. Dill, and L. J.
+Hwang.  Symbolic Model Checking: 10^20 States and Beyond.
+\fIInformation and Computation\fR, 98(2):142-170, June, 1992.
+.LP
+[3] J. R. Burch, E. M. Clarke, and D. E. Long.  Representing Circuits
+More Efficiently in Symbolic Model Checking.  In \fIProceedings of the
+28th ACM/IEEE Design Automation Conference\fR, June, 1991.
+.LP
+[4] J. R. Burch, E. M. Clarke, and D. E. Long.  Symbolic Model
+Checking with Partitioned Transition Relations.  In \fIProceedings of
+the 1991 International Conference on Very Large Scale Integration\fR,
+August, 1991.
+.SH AUTHOR
+David E. Long
+.br
+long@research.att.com
