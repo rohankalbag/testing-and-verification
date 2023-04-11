@@ -1,0 +1,5 @@
+c this is the expression for K = 0 for question 1 in the assignment
+c name: rohan rajesh kalbag roll: 20d170033
+p cnf 4 2
+-1 -2 -3 4 0
+1 -2 -3 -4 0
