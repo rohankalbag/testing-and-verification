@@ -1,0 +1,18 @@
+First set the path
+
+	source setup.sh
+
+Run the example
+
+	cd tests
+
+	minisat_static 1.cnf 1.result
+		This is satisfiable
+
+	minisat_static 2.cnf 2.result
+		This is not satisfiable
+
+For help on minisat, look here:
+
+	https://dwheeler.com/essays/minisat-user-guide.html	
+

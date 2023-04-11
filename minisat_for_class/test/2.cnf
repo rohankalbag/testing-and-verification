@@ -1,0 +1,10 @@
+c   nvars nclauses
+p cnf 2 4
+c x1 + x2
+1 2 0
+c x1 + (~x2)
+1 -2 0
+c (~x1) + (~x2)
+-1 -2 0
+c (~x1) + x2
+-1 2 0
