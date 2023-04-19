@@ -113,7 +113,43 @@ int main (int argc, char* argv[])
 
 	bdd_free_assoc(bddm, assoc);
 
-	bdd_quit(bddm);
+	// approach for question 2
+
+	// bdd for B(y)
+
+	bdd output_odd_high_bits = bdd_xor(bddm, sum[0], cout); 
 	
+	for(int i=1; i<4; i++){
+		output_odd_high_bits = bdd_xor(bddm, sum[i], output_odd_high_bits);
+	}
+	
+	// to find the preimage of set B
+	
+	condition = bdd_and(bddm, equivalence, output_odd_high_bits); 
+	
+	// To get pre-image apply existence quantification 
+	// S(x) = ∃y B(y).(y <-> F(x))
+	
+	for(int i=0; i<4;i++){
+		quantified_vars[i] = sum[i];
+	}
+
+	quantified_vars[4] = cout;
+
+	quantified_vars[5] = 0;
+
+	assoc = bdd_new_assoc(bddm, quantified_vars, 0);
+	bdd_assoc(bddm, assoc);
+	
+	// bdd for the pre-image of the set
+
+	bdd preimage = bdd_exists(bddm, condition);
+
+	printf("bdd of pre-image\n");
+	visualize_bdd(bddm, preimage);
+
+	bdd_free_assoc(bddm, assoc);
+	
+	bdd_quit(bddm);
 	return(0);
 }
