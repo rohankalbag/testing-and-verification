@@ -86,7 +86,8 @@ int main (int argc, char* argv[])
 
 	bdd condition = bdd_and(bddm, equivalence, has_odd_high_bits);
 
-	// To get image apply existence quantification
+	// To get image apply existence quantification 
+	// Q(y) = ∃x P(x).(y <-> F(x))
 
 	bdd quantified_vars[9];
 	
@@ -95,7 +96,7 @@ int main (int argc, char* argv[])
 	}
 
 	for(int i=4; i<8; i++){
-		quantified_vars[i] = y[i];
+		quantified_vars[i] = y[i - 4];
 	}
 
 	quantified_vars[8] = 0;
