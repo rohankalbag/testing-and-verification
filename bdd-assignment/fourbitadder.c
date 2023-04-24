@@ -152,17 +152,13 @@ int main (int argc, char* argv[])
 
 	// approach for question 3
 
-	printf("four bit even number greater than 2\n");
 	bdd even_four_bit_num = bdd_and(bddm, bdd_not(bddm, sum[0]), bdd_or(bddm, sum[2], sum[3])); // R(s)
-	visualize_bdd(bddm, even_four_bit_num);
 
-	printf("x is prime\n");
 	bdd x_is_prime = bdd_or(bddm, bdd_and(bddm, x[0], bdd_xor(bddm, x[1], x[2])), bdd_and(bddm, bdd_not(bddm, x[3]), bdd_or(bddm, bdd_and(bddm, x[0], x[2]), bdd_and(bddm, x[1], bdd_not(bddm, x[2])))));
-	visualize_bdd(bddm, x_is_prime);
-
 	bdd y_is_prime = bdd_or(bddm, bdd_and(bddm, y[0], bdd_xor(bddm, y[1], y[2])), bdd_and(bddm, bdd_not(bddm, y[3]), bdd_or(bddm, bdd_and(bddm, y[0], y[2]), bdd_and(bddm, y[1], bdd_not(bddm, y[2])))));
 	bdd x_is_prime_and_y_is_prime = bdd_and(bddm, x_is_prime, y_is_prime); // M(x, y)
 
+	// s <-> F(x, y)
 	equivalence = bdd_xnor(bddm, s[0], sum[0]);
 
 	for(int i=1; i<4; i++){
@@ -182,19 +178,39 @@ int main (int argc, char* argv[])
 	assoc = bdd_new_assoc(bddm, quantified_vars, 0);
 	bdd_assoc(bddm, assoc);
 
-	// condition = bdd_and(bddm, bdd_and(bddm, equivalence, x_is_prime_and_y_is_prime), even_four_bit_num);
+	// M(x,y).(s <-> F(x, y))
+
 	condition = bdd_and(bddm, equivalence, x_is_prime_and_y_is_prime);
 	
-	bdd existscond = bdd_exists(bddm, condition);
+	// ∃x,y M(x,y).(s <-> F(x, y))
+	bdd exists = bdd_exists(bddm, condition);
 
-	printf("exists\n");
-	visualize_bdd(bddm, existscond);
+	// R(s) -> ∃x,y M(x,y).(s <-> F(x, y))
+	bdd implication = bdd_or(bddm, exists, bdd_not(bddm, even_four_bit_num));
 
-	bdd next = bdd_or(bddm, existscond, bdd_not(bddm, even_four_bit_num));
+	bdd_free_assoc(bddm, assoc);
 
-	printf("next\n");
-	visualize_bdd(bddm, next);
+	// to prove for all outputs
+	for(int i=0;i<4;i++){
+		quantified_vars[i] = sum[i];
+	}
 
+	quantified_vars[4] = 0;
+
+	assoc = bdd_new_assoc(bddm, quantified_vars, 0);
+	bdd_assoc(bddm, assoc);
+
+	// ∀s [ R(s) -> ∃x,y M(x,y).(s <-> F(x, y)) ]
+	bdd final = bdd_forall(bddm, implication);
+
+	if(final == bdd_one(bddm)){
+		printf("The claim is correct, Hence Proved!\n");
+	}
+	else{
+		printf("The claim is incorrect, Hence Disproved!\n");
+	}
+
+	bdd_free_assoc(bddm, assoc);
 	bdd_quit(bddm);
 	return(0);
 }
