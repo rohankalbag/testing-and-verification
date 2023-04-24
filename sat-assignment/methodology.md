@@ -29,3 +29,9 @@ minisat_static q1c.cnf q1c.result > q1c.txt
 
 - The expression of K in minisat is done in `q1c.cnf`
 - The answer obtained = $(A,B,C,D) \equiv (F, T, T, T)$, found in `q1c.result`
+
+## Question 2
+
+```bash
+minisat_static q2.cnf q2.result > q2.txt
+```
