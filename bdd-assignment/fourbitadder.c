@@ -62,20 +62,20 @@ int main (int argc, char* argv[])
 	bdd x_has_odd_high_bits = bdd_xor(bddm, x[0], x[1]);
 	
 	for(int i=2; i<4; i++){
-		x_has_odd_high_bits = bdd_or(bddm, x[i], x_has_odd_high_bits);
+		x_has_odd_high_bits = bdd_xor(bddm, x[i], x_has_odd_high_bits);
 	} 
 
 	bdd y_has_odd_high_bits = bdd_xor(bddm, y[0], y[1]);
 	
 	for(int i=2; i<4; i++){
-		y_has_odd_high_bits = bdd_or(bddm, y[i], y_has_odd_high_bits);
+		y_has_odd_high_bits = bdd_xor(bddm, y[i], y_has_odd_high_bits);
 	} 
 
-	// function P(x) for subset A
+	// function P(x, y) for subset A
 
 	bdd has_odd_high_bits = bdd_and(bddm, x_has_odd_high_bits, y_has_odd_high_bits);
 
-	// function equivalence check y <-> F(x)
+	// function equivalence check c, s <-> F(x, y)
 
 	bdd equivalence = bdd_xnor(bddm, cout, c[4 - 1]);
 	
@@ -87,7 +87,7 @@ int main (int argc, char* argv[])
 	bdd condition = bdd_and(bddm, equivalence, has_odd_high_bits);
 
 	// To get image apply existence quantification 
-	// Q(y) = ∃x P(x).(y <-> F(x))
+	// Q(c, s) = ∃ x,y P(x, y).(c, s <-> F(x))
 
 	bdd quantified_vars[9];
 	
@@ -108,27 +108,28 @@ int main (int argc, char* argv[])
 
 	bdd image = bdd_exists(bddm, condition);
 
-	printf("bdd of image\n");
+	printf("bdd of image, where var.8 - cout\n");
+	printf("var.9 - sum[0], var.10 - sum[1], var.11 - sum[2], var.12 - sum[3]\n");
 	visualize_bdd(bddm, image);
 
 	bdd_free_assoc(bddm, assoc);
 
 	// approach for question 2
 
-	// bdd for B(y)
+	// bdd for B(s, c)
 
 	bdd output_odd_high_bits = bdd_xor(bddm, sum[0], cout); 
 	
 	for(int i=1; i<4; i++){
 		output_odd_high_bits = bdd_xor(bddm, sum[i], output_odd_high_bits);
 	}
-	
+	 
 	// to find the preimage of set B
 	
 	condition = bdd_and(bddm, equivalence, output_odd_high_bits); 
 	
 	// To get pre-image apply existence quantification 
-	// S(x) = ∃y B(y).(y <-> F(x))
+	// S(x, y) = ∃s,c B(s, c).(s, c <-> F(x, y))
 	
 	for(int i=0; i<4;i++){
 		quantified_vars[i] = sum[i];
@@ -145,7 +146,9 @@ int main (int argc, char* argv[])
 
 	bdd preimage = bdd_exists(bddm, condition);
 
-	printf("bdd of pre-image\n");
+	printf("bdd of pre-image, where var.0 - x[0]\n");
+	printf("var.1 - x[1], var.2 - x[2], var.3 - x[3], var.4 - y[0]\n");
+	printf("var.5 - y[1], var.6 - y[2], var.7 - y[3]\n");
 	visualize_bdd(bddm, preimage);
 
 	bdd_free_assoc(bddm, assoc);

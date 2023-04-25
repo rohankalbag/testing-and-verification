@@ -1,32 +1,51 @@
-bdd of image
+bdd of image, where var.8 - cout
+var.9 - sum[0], var.10 - sum[1], var.11 - sum[2], var.12 - sum[3]
 ----------------------------------------------------
 if var.8
   if var.9
     if var.10
-      if var.11
+      !var.11
+    else if !var.10
+      0: if var.11
         !var.12
       else if !var.11
         1
       endif var.11
+    endif var.10
+  else if !var.9
+    if var.10
+      subformula 0
     else if !var.10
       1
     endif var.10
-  else if !var.9
-    1
   endif var.9
 else if !var.8
-  if var.10
-    1
-  else if !var.10
-    if var.11
+  if var.9
+    if var.10
+      if var.11
+        var.12
+      else if !var.11
+        1
+      endif var.11
+    else if !var.10
+      1: if var.11
+        1
+      else if !var.11
+        var.12
+      endif var.11
+    endif var.10
+  else if !var.9
+    if var.10
       1
-    else if !var.11
-      var.12
-    endif var.11
-  endif var.10
+    else if !var.10
+      subformula 1
+    endif var.10
+  endif var.9
 endif var.8
 ----------------------------------------------------
-bdd of pre-image
+bdd of pre-image, where var.0 - x[0]
+var.1 - x[1], var.2 - x[2], var.3 - x[3], var.4 - y[0]
+var.5 - y[1], var.6 - y[2], var.7 - y[3]
 ----------------------------------------------------
 if var.0
   if var.1
