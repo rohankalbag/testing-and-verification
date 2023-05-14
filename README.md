@@ -4,8 +4,8 @@
 
 *This repository contains all the relevant files, my solutions to the assignments done in the course. The language and frameworks used were C, minisat, bddlib*
 
-- [BDD Based Formal Verification]()
-- [SAT Based Formal Verification/Test Generation]()
-- [Boolean Algebras]()
-- [Switching Algebras]()
-- [PODEM]()
+- [BDD Based Formal Verification](https://github.com/rohankalbag/ee709-iitb/blob/main/bdd-assignment/report.pdf)
+- [SAT Based Formal Verification/Test Generation](https://github.com/rohankalbag/ee709-iitb/blob/main/sat-assignment/sat_report.pdf)
+- [Boolean Algebras](https://github.com/rohankalbag/ee709-iitb/blob/main/assignment1_report.pdf)
+- [Switching Algebras](https://github.com/rohankalbag/ee709-iitb/blob/main/assignment2_report.pdf)
+- [PODEM](https://github.com/rohankalbag/ee709-iitb/blob/main/podem_assignment.pdf)
